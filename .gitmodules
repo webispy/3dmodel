@@ -1,0 +1,6 @@
+[submodule "externals/NopSCADlib"]
+	path = externals/NopSCADlib
+	url = https://github.com/nophead/NopSCADlib.git
+[submodule "externals/openscad-rpi-library"]
+	path = externals/openscad-rpi-library
+	url = https://github.com/RigacciOrg/openscad-rpi-library.git
