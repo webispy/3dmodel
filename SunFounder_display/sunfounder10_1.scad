@@ -1,30 +1,4 @@
-module roundedCube(xx, yy, height, radius) {
-    difference() {
-        cube([xx,yy,height]);
-
-        difference() {
-            translate([-.5,-.5,-.2]) cube([radius+.5,radius+.5,height+.5]);
-            translate([radius,radius,height/2]) cylinder(height,radius,radius,true);
-        }
-
-        translate([xx,0,0]) rotate(90) difference() {
-            translate([-.5,-.5,-.2]) cube([radius+.5,radius+.5,height+.5]);
-            translate([radius,radius,height/2]) cylinder(height,radius,radius,true);
-        }
-
-        translate([xx,yy,0]) rotate(180) difference() {
-            translate([-.5,-.5,-.2]) cube([radius+.5,radius+.5,height+.5]);
-            translate([radius,radius,height/2]) cylinder(height,radius,radius,true);
-        }
-
-        translate([0,yy,0]) rotate(270) difference() {
-            translate([-.5,-.5,-.2]) cube([radius+.5,radius+.5,height+.5]);
-            translate([radius,radius,height/2]) cylinder(height,radius,radius,true);
-        }
-    }
-}
-
-// ----------------------------------------------------------------
+use <../externals/roundedCube.scad>
 
 /* Sunfounder 10.1 inch Display kit */
 GlassWidth = 257;
@@ -71,17 +45,17 @@ module sunfounder_10_1() {
                 }
 
                 /* DisplayBoard connector */
-                color("orange") translate([25, BottomHeight, MainPanelDepth])
-                    cube([35, 80, SupportBlockDepth * 2]);
+                color("orange")
+                    translate([25, BottomHeight, MainPanelDepth])
+                        cube([35, 80, SupportBlockDepth * 2]);
 
                 /* Support Area */
                 translate([(MainPanelWidth - SupportAreaWidth) / 2,
                            (MainPanelHeight - SupportAreaHeight) / 2 + 16,
                            MainPanelDepth]) {
                     if (DebugSupportArea) {
-                        color("gray", alpha=0.2) {
+                        color("gray", alpha=0.2)
                             cube([SupportAreaWidth, SupportAreaHeight, SupportAreaDepth]);
-                        }
                     }
 
                     color("red") {
@@ -100,28 +74,26 @@ module sunfounder_10_1() {
                         /* DisplayBoard RB */
                         translate([60, 0, 0]) {
                             cube([SupportBlockWidth, SupportBlockHeight, SupportBlockDepth]);
-                                translate([SupportBlockWidth/2, SupportBlockHeight/2, 0])
-                                    cylinder(SupportBlockDepth * 2, r=SupportHoleRadius);
+                            translate([SupportBlockWidth/2, SupportBlockHeight/2, 0])
+                                cylinder(SupportBlockDepth * 2, r=SupportHoleRadius);
                         }
 
                         /* DisplayBoard RT */
                         translate([60, SupportAreaHeight-SupportBlockHeight, 0]) {
                             cube([SupportBlockWidth, SupportBlockHeight, SupportBlockDepth]);
-                                translate([SupportBlockWidth/2, SupportBlockHeight/2, 0])
-                                    cylinder(SupportBlockDepth * 2, r=SupportHoleRadius);
+                            translate([SupportBlockWidth/2, SupportBlockHeight/2, 0])
+                                cylinder(SupportBlockDepth * 2, r=SupportHoleRadius);
                         }
 
-			/* RpiBoard Vertical Rail */
-                        translate([80, SupportAreaHeight - 93, 0]) {
+                        /* RpiBoard Vertical Rail */
+                        translate([80, SupportAreaHeight - 93, 0])
                             cube([10, 92, SupportBlockDepth * 2]);
-                        }
 
                         /* RpiBoard space */
-                        translate([80, SupportAreaHeight - 88, 0]) {
+                        translate([80, SupportAreaHeight - 88, 0])
                             cube([99, 80, SupportBlockDepth * 2]);
-                        }
 
-			/* Right Bottom */
+                        /* Right Bottom */
                         translate([SupportAreaWidth - SupportBlockWidth, 0, 0]) {
                             cube([SupportBlockWidth, SupportBlockHeight, SupportBlockDepth]);
                             translate([SupportBlockWidth/2, SupportBlockHeight/2, 0])
