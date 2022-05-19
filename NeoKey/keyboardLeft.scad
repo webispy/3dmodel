@@ -32,9 +32,9 @@ KEYS = KEYS_LEFT_0124;
 border = 5;
 width = 136.5 + (border * 2);
 
-DrawTopPlate = 1;
+DrawTopPlate = 0;
 DrawKeyboard = 0;
-DrawBottomPlate = 0;
+DrawBottomPlate = 1;
 DrawProto = 0;
 
 if (DrawTopPlate) {

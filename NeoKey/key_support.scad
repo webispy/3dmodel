@@ -59,9 +59,10 @@ pinHeaderHeight = 8.7;
 PinHeaderDistance = 13.2;
 
 // ----
-cableFrameHeight = 12;
-cableFrameOffset = -4;
-cableFrameDepth = 3;
+useCableFrame = 1;
+_cfHeight = 12;
+_cfOffset = -4;
+_cfDepth = 3;
 cableFramePinHeaderDepth = 2;
 
 // ----
@@ -71,8 +72,13 @@ bottomPlateDepth = 3.0;
 
 // ----
 SwitchDepth = 4.5;
-SwitchHoleSize = 14.5; //15.0;
+SwitchHoleSize = 15.0; //15.0;
+SwitchHolderDepth = 1.5;
+SwitchHoleHolderSize = 14.2; //15.0;
 topPlateDepth = SwitchDepth + SupportDepth;
+
+// ---
+centerScrewHoleAllowWidth = 100;
 
 // ---
 bodyDepth = 8.0;
@@ -89,6 +95,11 @@ function getKeyHeight() = U1 + NeoKeyMargin;
 function getTopPlateDepth() = topPlateDepth;
 function getBottomPlateDepth() = bottomPlateDepth;
 function getBodyDepth() = bodyDepth;
+
+// ----
+function getCableFrameHeight() = useCableFrame * _cfHeight;
+function getCableFrameOffset() = useCableFrame * _cfOffset;
+function getCableFrameDepth() = useCableFrame * _cfDepth;
 
 /**
  * Full area of one (switch + pcb) for masking
@@ -151,8 +162,13 @@ module SwitchSupport(u_size = U1) {
         }
 
         // Hole for switch
-        translate([cx - (SwitchHoleSize / 2), cy - (SwitchHoleSize / 2), 0])
-            cube([SwitchHoleSize, SwitchHoleSize, SwitchDepth + SupportDepth]);
+        holderZ = SwitchDepth + SupportDepth - SwitchHolderDepth;
+        translate([cx - (SwitchHoleSize / 2),
+                   cy - (SwitchHoleSize / 2), 0])
+            cube([SwitchHoleSize, SwitchHoleSize, holderZ]);
+        translate([cx - (SwitchHoleHolderSize / 2),
+                   cy - (SwitchHoleHolderSize / 2), holderZ])
+            cube([SwitchHoleHolderSize, SwitchHoleHolderSize, SwitchHolderDepth]);
     }
 }
 
@@ -363,18 +379,22 @@ module KeyboardBody(border, width, keymap, guide_text = false) {
         union() {
             translate([0,0,0])
                 cube([width, height, bodyDepth]);
-            translate([border, height + cableFrameOffset, 0]) /* Cable frame */
-                cube([width - border * 2, cableFrameHeight, cableFrameDepth]);
-            translate([border, height + cableFrameOffset + cableFrameHeight - 2, cableFrameDepth]) /* Card holder */
-                cube([width - border * 2, 2, bodyDepth - cableFrameDepth + topPlateDepth]);
+            if (useCableFrame) {
+                translate([border, height + getCableFrameOffset(), 0]) /* Cable frame */
+                    cube([width - border * 2, getCableFrameHeight(), getCableFrameDepth()]);
+                translate([border, height + getCableFrameOffset() + getCableFrameHeight() - 2, getCableFrameDepth()]) /* Card holder */
+                    cube([width - border * 2, 2, bodyDepth - getCableFrameDepth() + topPlateDepth]);
+            }
         }
 
-        /* Scre area hole to card holder*/
-        translate([width / 2 - border, height, cableFrameDepth])
-            cube([border * 2, cableFrameHeight, bodyDepth - cableFrameDepth + topPlateDepth]);
+        if (useCableFrame) {
+            /* Screw area hole to card holder */
+            translate([width / 2 - border, height, getCableFrameDepth()])
+                cube([border * 2, getCableFrameHeight(), bodyDepth - getCableFrameDepth() + topPlateDepth]);
 
-        translate([border * 2, height + cableFrameOffset, 0])
-            cube([width - border * 4, cableFrameHeight, bottomPlateDepth - cableFramePinHeaderDepth]);
+            translate([border * 2, height + getCableFrameOffset(), 0])
+                cube([width - border * 4, getCableFrameHeight(), bottomPlateDepth - cableFramePinHeaderDepth]);
+        }
 
         translate([border, border, 0])
             GenerateHole(keymap, bodyDepth);
@@ -383,8 +403,8 @@ module KeyboardBody(border, width, keymap, guide_text = false) {
 
     /* Center support for screw hole */
     margin = 2;
-    translate([width/2 - (border+margin)/2, height + cableFrameOffset, 0])
-        cube([border+margin, cableFrameHeight, 2]);
+    translate([width/2 - (border+margin)/2, height + getCableFrameOffset(), 0])
+        cube([border+margin, getCableFrameHeight(), 2]);
 
     translate([border, border, 0])
         GenerateKey(keymap, guide_text);
@@ -458,19 +478,20 @@ module _BottomCableFrame(border, width, height) {
         cube([border * 2, border, bottomFrameDepth]);
 
     /* Cable frame */
-    translate([border, height + cableFrameOffset, 0])
-        cube([border, cableFrameHeight, bottomFrameDepth]);
-    translate([width - border * 2, height + cableFrameOffset, 0])
-        cube([border, cableFrameHeight, bottomFrameDepth]);
+    if (useCableFrame == true) {
+        translate([border, height + getCableFrameOffset(), 0])
+            cube([border, getCableFrameHeight(), bottomFrameDepth]);
+        translate([width - border * 2, height + getCableFrameOffset(), 0])
+            cube([border, getCableFrameHeight(), bottomFrameDepth]);
 
-
-    translate([border * 2, height + cableFrameOffset, 0])
-        cube([width - border * 4, cableFrameHeight, bottomFrameDepth - bottomFramePinHeaderDepth]);
+        translate([border * 2, height + getCableFrameOffset(), 0])
+            cube([width - border * 4, getCableFrameHeight(), bottomFrameDepth - bottomFramePinHeaderDepth]);
+    }
 
     /* Center support for screw hole */
     margin = 2;
-    translate([width/2 - (border+margin)/2, height + cableFrameOffset, 0])
-        cube([border+margin, cableFrameHeight, bottomFrameDepth]);
+    translate([width/2 - (border+margin)/2, height + getCableFrameOffset(), 0])
+        cube([border+margin, getCableFrameHeight(), bottomFrameDepth]);
     translate([width/2 - (border+margin)/2, 0, 0])
         cube([border+margin, border, bottomFrameDepth]);
 }
@@ -483,11 +504,13 @@ module KeyboardBottomPlate(border, width, keymap) {
     plateDepth = bottomPlateDepth - bottomFrameDepth;
     cube([width, height, plateDepth]);
 
-    translate([border, height + cableFrameOffset, 0])
-        cube([width - border * 2, cableFrameHeight, plateDepth]);
+    translate([border, height + getCableFrameOffset(), 0])
+        cube([width - border * 2, getCableFrameHeight(), plateDepth]);
 
-    translate([0, 0, bottomFrameDepth])
-        _BottomCableFrame(border, width, height);
+    if (useCableFrame) {
+        translate([0, 0, bottomFrameDepth])
+            _BottomCableFrame(border, width, height);
+    }
 }
 
 /**
@@ -497,7 +520,7 @@ module screwHole(border, width, keymap,
                  holeDepth = bodyDepth, holeSize = 2.5, cornerDepth = 0,
                  screwPositionTop = true) {
     height = getKeyboardHeight(border, keymap);
-    topCenterHeight = height + cableFrameOffset + cableFrameHeight;
+    topCenterHeight = height + getCableFrameOffset() + getCableFrameHeight();
     union() {
         if (cornerDepth != 0) {
             if (screwPositionTop) {
@@ -509,8 +532,10 @@ module screwHole(border, width, keymap,
                     cube([border, border, holeDepth - cornerDepth]);
                 translate([width - border, height - border, cornerDepth]) /* Top-right */
                     cube([border, border, holeDepth - cornerDepth]);
-                translate([width/2 - border/2, 0, cornerDepth]) /* Bottom-Center */
-                    cube([border, border, holeDepth - cornerDepth]);
+                if (width > centerScrewHoleAllowWidth) {
+                    translate([width/2 - border/2, 0, cornerDepth]) /* Bottom-Center */
+                        cube([border, border, holeDepth - cornerDepth]);
+                }
             } else {
                 translate([0, 0, 0]) /* Bottom-Left */
                     cube([border, border, cornerDepth]);
@@ -522,8 +547,11 @@ module screwHole(border, width, keymap,
                     cube([border, border, cornerDepth]);
                 translate([width/2 - border/2, topCenterHeight - border, 0]) /* Top-Center */
                     cube([border, border, cornerDepth]);
-                translate([width/2 - border/2, 0, 0]) /* Bottom-Center */
-                    cube([border, border, cornerDepth]);            }
+                if (width > centerScrewHoleAllowWidth) {
+                    translate([width/2 - border/2, 0, 0]) /* Bottom-Center */
+                        cube([border, border, cornerDepth]);
+                }
+            }
         }
 
         // Screw hole
@@ -537,7 +565,9 @@ module screwHole(border, width, keymap,
             cylinder(h = holeDepth, r = holeSize/2);
         translate([width/2, topCenterHeight - border/2, 0]) /* Top-Center */
             cylinder(h = holeDepth, r = holeSize/2);
-        translate([width/2, border/2, 0]) /* Bottom-Center */
-            cylinder(h = holeDepth, r = holeSize/2);
+        if (width > centerScrewHoleAllowWidth) {
+            translate([width/2, border/2, 0]) /* Bottom-Center */
+                cylinder(h = holeDepth, r = holeSize/2);
+        }
     }
 }
